@@ -1,9 +1,7 @@
-import logging.config
 import os
 from pathlib import Path
 
 import dj_database_url
-from csp.constants import NONE, SELF, STRICT_DYNAMIC
 from django.contrib import messages
 from django.utils.log import DEFAULT_LOGGING
 from django.utils.translation import gettext_lazy as _
@@ -40,10 +38,13 @@ INSTALLED_APPS = [
     "rest_framework",
     "corsheaders",
     "csp",
+    'axes',
+    'simple_history',
     "apps.shared",
     "apps.main",
     "apps.users",
     "apps.identity",
+    "apps.blog"
 ]
 
 MIDDLEWARE = [
@@ -57,9 +58,11 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    'simple_history.middleware.HistoryRequestMiddleware',
     "whitenoise.middleware.WhiteNoiseMiddleware",
-    "axes.middleware.AxesMiddleware",
     "csp.middleware.CSPMiddleware",
+    
+    "axes.middleware.AxesMiddleware", # should be last
 ]
 
 AUTHENTICATION_BACKENDS = [
@@ -268,13 +271,13 @@ CORS_URLS_REGEX = r"^/api/.*$"
 CORS_ALLOWED_ORIGIN_REGEXES = os.environ.get("ALLOWED_ORIGINS", "").split(",") or []
 
 AXES_ENABLED = True
-AXES_COOLOFF_TIME = 0.25
-AXES_FAILURE_LIMIT = 8
+AXES_COOLOFF_TIME = float(os.environ.get("AXES_COOLOFF_TIME", 0.25))
+AXES_FAILURE_LIMIT = int(os.environ.get("AXES_FAILURE_LIMIT", 10))
 AXES_RESET_ON_SUCCESS = True
 AXES_USERNAME_FORM_FIELD = "email"
-AXES_LOCKOUT_CALLABLE = "identity.views.lockout"
-AXES_LOCKOUT_TEMPLATE = "identity/lockout.html"
-
+AXES_LOCKOUT_CALLABLE = "apps.identity.views.lockout"
+AXES_LOCKOUT_TEMPLATE = "apps.identity/lockout.html"
+AXES_LOCKOUT_PARAMETERS = [["username", "user_agent"]]
 
 REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
@@ -288,35 +291,44 @@ EMAIL_HOST = os.environ.get("EMAIL_HOST", "")
 EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER", "")
 EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD", "")
 EMAIL_PORT = os.environ.get("EMAIL_PORT", "")
-EMAIL_USE_TLS = str(os.environ.get("EMAIL_USE_TLS")) == "1"
-EMAIL_USE_SSL = str(os.environ.get("EMAIL_USE_SSL")) == "1"
+EMAIL_USE_TLS = int(os.environ.get("EMAIL_USE_TLS", 0)) == 1
+EMAIL_USE_SSL = int(os.environ.get("EMAIL_USE_SSL", 0)) == 1
 EMAIL_USE_LOCALTIME = True
 
 SIMPLE_HISTORY_HISTORY_ID_USE_UUID = True
+SIMPLE_HISTORY_ENFORCE_HISTORY_MODEL_PERMISSIONS = True
+SIMPLE_HISTORY_HISTORY_CHANGE_REASON_USE_TEXT_FIELD=True
 
 MAINTENANCE_MODE = int(os.environ.get("MAINTENANCE_MODE", 0))
 MAINTENANCE_BYPASS_QUERY = os.environ.get("MAINTENANCE_BYPASS_QUERY")
 
+
+CSP_NONE = "'none'"
+CSP_SELF = "'self'"
+CSP_STRICT_DYNAMIC = "'strict-dynamic'"
+CSP_NONCE = "'nonce'"
+
 CONTENT_SECURITY_POLICY = {
     "DIRECTIVES": {
-        "default-src": [SELF],
-        "frame-ancestors": [SELF],
-        "form-action": [SELF],
-        "script-src": [SELF, STRICT_DYNAMIC],
-        "style-src": [SELF],
+        "default-src": [CSP_SELF],
+        "frame-ancestors": [CSP_SELF],
+        "form-action": [CSP_SELF],
+        "script-src": [CSP_SELF, CSP_STRICT_DYNAMIC, CSP_NONCE],
+        "style-src": [CSP_SELF],
         "report-uri": "/csp-report/",
+        "img-src": [CSP_SELF, "data:"],
     },
 }
 
 CONTENT_SECURITY_POLICY_REPORT_ONLY = {
     "DIRECTIVES": {
-        "default-src": [NONE],
-        "connect-src": [SELF],
-        "img-src": [SELF],
-        "form-action": [SELF],
-        "frame-ancestors": [SELF],
-        "script-src": [SELF],
-        "style-src": [SELF],
+        "default-src": [CSP_NONE],
+        "connect-src": [CSP_SELF],
+        "img-src": [CSP_SELF],
+        "form-action": [CSP_SELF],
+        "frame-ancestors": [CSP_SELF],
+        "script-src": [CSP_SELF],
+        "style-src": [CSP_SELF],
         "upgrade-insecure-requests": True,
         "report-uri": "/csp-report/",
     },

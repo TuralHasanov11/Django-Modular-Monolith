@@ -1,11 +1,18 @@
 from django.contrib import admin
 
 from apps.blog.models import Post
+from simple_history.admin import SimpleHistoryAdmin
 
 
 @admin.register(Post)
-class UserAdmin(admin.ModelAdmin):
-    list_display = ("title", "updated_by_username", "updated_at", "is_deleted", "delete_at")
+class PostAdmin(SimpleHistoryAdmin):
+    list_display = (
+        "title",
+        "updated_by_username",
+        "updated_at",
+        "is_deleted",
+        "deleted_at",
+    )
     list_filter = ("title", "is_deleted", "updated_by_username")
     fieldsets = (
         (
@@ -13,6 +20,12 @@ class UserAdmin(admin.ModelAdmin):
             {
                 "fields": (
                     "title",
+                    "created_at",
+                    "created_by_username",
+                    "updated_by_username",
+                    "updated_at",
+                    "is_deleted",
+                    "deleted_at",
                 )
             },
         ),
@@ -22,12 +35,21 @@ class UserAdmin(admin.ModelAdmin):
             None,
             {
                 "classes": ("wide",),
-                "fields": (
-                    "title",
-                ),
+                "fields": ("title"),
             },
         ),
     )
+    readonly_fields = [
+        "created_at",
+        "created_by_username",
+        "updated_by_username",
+        "updated_at",
+        "is_deleted",
+        "deleted_at",
+    ]
+    # add other fields as readonly
     search_fields = ("title",)
     ordering = ("created_at",)
     filter_horizontal = ()
+    history_list_display = ["title"]
+    history_list_per_page = 100

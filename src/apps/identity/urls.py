@@ -12,4 +12,5 @@ urlpatterns = [
         name="register",
     ),
     path("logout", identity_views.LogoutView.as_view(), name="logout"),
+    path("lockout", identity_views.lockout, name="lockout"),
 ]

@@ -1,6 +1,13 @@
 from __future__ import annotations
 from django.db import models
-from shared.models import AuditableEntity, SoftDeletableEntity, LanguageField
+from apps.shared.models import (
+    AuditableEntity,
+    DeletedAtField,
+    AuditRecords,
+    LanguageField,
+    SoftDeletable,
+)
+from datetime import datetime, timezone
 
 
 class PostManager(models.Manager):
@@ -11,11 +18,11 @@ class PostManager(models.Manager):
         return super().get_queryset()
 
 
-class Post(AuditableEntity, SoftDeletableEntity):
+class Post(AuditableEntity, SoftDeletable):
     title = models.CharField(max_length=255, null=False, blank=False)
     language = LanguageField()
 
-    entities = PostManager()
+    objects = PostManager()
 
-    class Meta(AuditableEntity.Meta, SoftDeletableEntity.Meta):
+    class Meta(AuditableEntity.Meta, SoftDeletable.Meta):
         pass
