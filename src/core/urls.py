@@ -3,8 +3,6 @@ from django.urls import path, re_path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from django.conf.urls.i18n import i18n_patterns
-from apps.identity import views as identity_views
-
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -13,8 +11,6 @@ urlpatterns = [
 
 urlpatterns += i18n_patterns(
     path("", include("apps.main.urls", namespace="main")),
-    path("", include("apps.inventory.urls", namespace="inventory")),
-    path("", include("apps.store.urls", namespace="store")),
     path("identity/", include("apps.identity.urls", namespace="identity")),
     prefix_default_language=False,
 )
