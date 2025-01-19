@@ -1,0 +1,60 @@
+{% extends 'shared/base_layout.html' %} 
+{% load static %} 
+{% load i18n %} 
+{% block title %}{% translate "Register" %}{% endblock title %} {% block description %}
+{% translate "Register Description" %}{% endblock description %} 
+{% block content %}
+<main>
+    <div class="container-xl px-4">
+        <div class="row justify-content-center">
+            <div class="col-lg-5">
+                <div class="card shadow-lg border-0 rounded-lg mt-5">
+                    <div class="card-header justify-content-center"><h3 class="fw-light my-4">{% translate "Register" %}</h3></div>
+                    <div class="card-body">
+                        <form method="POST">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <label class="small mb-1" for="{{form.username.id_for_label}}">{{form.username.label}}</label>
+                                {{form.username}}
+                                {{form.username.errors}}
+                            </div>
+                            <div class="mb-3">
+                                <label class="small mb-1" for="{{form.first_name.id_for_label}}">{{form.first_name.label}}</label>
+                                {{form.first_name}}
+                                {{form.first_name.errors}}
+                            </div>
+                            <div class="mb-3">
+                                <label class="small mb-1" for="{{form.last_name.id_for_label}}">{{form.last_name.label}}</label>
+                                {{form.last_name}}
+                                {{form.last_name.errors}}
+                            </div>
+                            <div class="mb-3">
+                                <label class="small mb-1" for="{{form.email.id_for_label}}">{{form.email.label}}</label>
+                                {{form.email}}
+                                {{form.email.errors}}
+                            </div>
+                            <div class="mb-3">
+                                <label class="small mb-1" for="{{form.password1.id_for_label}}">{{form.password1.label}}</label>
+                                {{form.password1}}
+                                {{form.password1.errors}}
+                            </div>
+                            <div class="mb-3">
+                                <label class="small mb-1" for="{{form.password2.id_for_label}}">{{form.password2.label}}</label>
+                                {{form.password2}}
+                                {{form.password2.errors}}
+                            </div>
+                            {% include "shared/hidden_form_fields.html" with hidden_fields=form.hidden_fields %}
+                            {{form.non_form_errors}} 
+                            {{form.non_field_errors}} 
+                            <div class="d-flex align-items-center justify-content-between mt-4 mb-0">
+                                <button type="submit" class="btn btn-success">{% translate "Register" %}</button>
+                                <a href="{% url 'main:home' %}" class="btn btn-primary">{% translate "Back to Home" %}</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+{% endblock content %}
