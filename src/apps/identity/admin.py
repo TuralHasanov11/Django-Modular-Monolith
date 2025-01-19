@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
-from apps.identity.models import IdentityUser
+from apps.identity.models import User
 
 
 class UserAdmin(BaseUserAdmin):
@@ -53,4 +53,4 @@ class UserAdmin(BaseUserAdmin):
     filter_horizontal = ()
 
 
-admin.site.register(IdentityUser, UserAdmin)
+admin.site.register(User, UserAdmin)

@@ -5,7 +5,7 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 from django.views.generic.edit import CreateView, DeleteView
 
-from apps.identity.models import IdentityUser
+from apps.identity.models import User
 
 
 # class UserListView(LoginRequiredMixin, PermissionRequiredMixin, TemplateView):

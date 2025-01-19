@@ -12,6 +12,7 @@ urlpatterns = [
 urlpatterns += i18n_patterns(
     path("", include("apps.main.urls", namespace="main")),
     path("identity/", include("apps.identity.urls", namespace="identity")),
+    path('accounts/', include('allauth.urls')),
     prefix_default_language=False,
 )
 

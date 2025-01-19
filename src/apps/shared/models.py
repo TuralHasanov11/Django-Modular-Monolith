@@ -1,20 +1,17 @@
 from __future__ import annotations
 
-import uuid
 from dataclasses import dataclass
 from datetime import datetime, timezone
-from typing import List
-from typing import Type
-from abc import abstractmethod, ABC
+from typing import List, Protocol, Type
+
 from django.conf import settings
 from django.db import models
+from django.dispatch import receiver
 from django.utils.translation import gettext_lazy as _
 from simple_history.models import HistoricalRecords
-
-from apps.identity.models import IdentityUser
-from django.dispatch import receiver
 from simple_history.signals import post_create_historical_record
-from typing import Protocol
+
+from apps.identity.models import User
 
 
 class LanguageField(models.CharField):
@@ -156,7 +153,7 @@ class SoftDeletable(models.Model):
 def post_create_historical_record_callback(
     sender: Type[AuditableEntity],
     instance: AuditableEntity,
-    history_user: IdentityUser,
+    history_user: User,
     **kwargs,
 ):
     if instance.created_by_user is None:

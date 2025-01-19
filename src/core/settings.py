@@ -40,6 +40,15 @@ INSTALLED_APPS = [
     "csp",
     'axes',
     'simple_history',
+    "allauth_ui",
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.github',
+    "widget_tweaks",
+    "slippers",
+    # "allauth.mfa",
+    
     "apps.shared",
     "apps.main",
     "apps.users",
@@ -61,13 +70,14 @@ MIDDLEWARE = [
     'simple_history.middleware.HistoryRequestMiddleware',
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "csp.middleware.CSPMiddleware",
-    
+    "allauth.account.middleware.AccountMiddleware",
     "axes.middleware.AxesMiddleware", # should be last
 ]
 
 AUTHENTICATION_BACKENDS = [
     "axes.backends.AxesStandaloneBackend",
     "django.contrib.auth.backends.ModelBackend",
+    'allauth.account.auth_backends.AuthenticationBackend',
 ]
 
 ROOT_URLCONF = "core.urls"
@@ -114,7 +124,7 @@ if DATABASE_URL:
     db_from_env = dj_database_url.config(default=DATABASE_URL, conn_max_age=1800)
     DATABASES["default"].update(db_from_env)
 
-AUTH_USER_MODEL = "identity.IdentityUser"
+AUTH_USER_MODEL = "identity.User"
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -135,7 +145,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
-LOGIN_URL = "identity:login"
+# LOGIN_URL = "identity:login"
 LOGIN_REDIRECT_URL = "main:home"
 
 
@@ -286,13 +296,16 @@ REST_FRAMEWORK = {
 }
 
 DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", "")
-EMAIL_BACKEND = "django_smtp_ssl.SSLEmailBackend"
+if DEBUG:
+    EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+else:
+    EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = os.environ.get("EMAIL_HOST", "")
 EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER", "")
 EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD", "")
 EMAIL_PORT = os.environ.get("EMAIL_PORT", "")
-EMAIL_USE_TLS = int(os.environ.get("EMAIL_USE_TLS", 0)) == 1
-EMAIL_USE_SSL = int(os.environ.get("EMAIL_USE_SSL", 0)) == 1
+EMAIL_USE_TLS = True
+EMAIL_USE_SSL = False
 EMAIL_USE_LOCALTIME = True
 
 SIMPLE_HISTORY_HISTORY_ID_USE_UUID = True
@@ -310,11 +323,11 @@ CSP_NONCE = "'nonce'"
 
 CONTENT_SECURITY_POLICY = {
     "DIRECTIVES": {
-        "default-src": [CSP_SELF],
+        "default-src": [CSP_NONE],
         "frame-ancestors": [CSP_SELF],
         "form-action": [CSP_SELF],
-        "script-src": [CSP_SELF, CSP_STRICT_DYNAMIC, CSP_NONCE],
-        "style-src": [CSP_SELF],
+        "script-src": [CSP_SELF, CSP_STRICT_DYNAMIC, "https://cdn.jsdelivr.net/npm/bootstrap@5.3.3"],
+        "style-src": [CSP_SELF, "https://cdn.jsdelivr.net/npm/bootstrap@5.3.3"],
         "report-uri": "/csp-report/",
         "img-src": [CSP_SELF, "data:"],
     },
@@ -327,9 +340,28 @@ CONTENT_SECURITY_POLICY_REPORT_ONLY = {
         "img-src": [CSP_SELF],
         "form-action": [CSP_SELF],
         "frame-ancestors": [CSP_SELF],
-        "script-src": [CSP_SELF],
-        "style-src": [CSP_SELF],
+        "script-src": [CSP_SELF, CSP_STRICT_DYNAMIC, "https://cdn.jsdelivr.net/npm/bootstrap@5.3.3"],
+        "style-src": [CSP_SELF, "https://cdn.jsdelivr.net/npm/bootstrap@5.3.3"],
         "upgrade-insecure-requests": True,
         "report-uri": "/csp-report/",
     },
 }
+
+
+SOCIALACCOUNT_PROVIDERS = {
+
+}
+
+ACCOUNT_AUTHENTICATION_METHOD = "username_email"
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_EMAIL_VERIFICATION = "mandatory"
+
+# MFA_SUPPORTED_TYPES = [
+#     "webauthn",
+#     "totp",
+#     "recovery_codes",
+# ]
+# MFA_PASSKEY_LOGIN_ENABLED = True
+# MFA_PASSKEY_SIGNUP_ENABLED = True
+
+ALLAUTH_UI_THEME = "light"

@@ -5,7 +5,7 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView, View
 from django.views.generic.edit import CreateView
 from django.contrib.auth import views as auth_views
-from apps.identity.models import IdentityUser
+from apps.identity.models import User
 from apps.identity.forms import LoginForm, RegistrationForm
 from django.http import HttpRequest, JsonResponse
 from rest_framework import status
@@ -24,7 +24,7 @@ class RegistrationView(CreateView):
     redirect_field_name = reverse_lazy("main:home")
     redirect_authenticated_user = True
     template_name = "identity/register.html"
-    model = IdentityUser
+    model = User
     success_url = reverse_lazy("identity:login")
 
 
