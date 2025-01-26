@@ -349,7 +349,9 @@ CONTENT_SECURITY_POLICY_REPORT_ONLY = {
 
 
 SOCIALACCOUNT_PROVIDERS = {
-
+    "github":{
+        "VERIFIED_EMAIL": True
+    }
 }
 
 ACCOUNT_AUTHENTICATION_METHOD = "username_email"
